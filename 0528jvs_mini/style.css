@@ -166,3 +166,46 @@ body {
   width: 300px;
   margin: 10px 0;
 }
+
+@keyframes fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100px) scale(0.5);
+  }
+}
+
+.star {
+  position: absolute;
+  font-size: 20px;
+  color: gold;
+  pointer-events: none;
+  animation: fall 1.5s ease-out forwards;
+}
+
+@keyframes petal-fall {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.petal {
+  position: fixed; /* ← fixed로 반드시 고정 */
+  top: -30px;       /* 항상 화면 위에서 시작 */
+  width: 24px;
+  height: 24px;
+  background-image: url('images/벚꽃잎.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: petal-fall 3s linear forwards;
+  z-index: 9999;    /* 다른 요소 위에 */
+}
