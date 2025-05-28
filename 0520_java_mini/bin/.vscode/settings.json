@@ -1,0 +1,15 @@
+{
+  "java.project.sourcePaths": ["."],
+  "java.project.outputPath": "bin",
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar"
+  ],
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "terminal.integrated.profiles.windows": {
+    "Command Prompt": {
+      "path": ["${env:windir}\\System32\\cmd.exe"],
+      "args": ["/K", "chcp 65001"]
+    }
+  },
+  "java.debug.settings.onBuildFailureProceed": true
+}
