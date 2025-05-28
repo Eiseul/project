@@ -1,4 +1,8 @@
-// script.js (전체 주석 포함)
+// ⭐ 전역 변수 추가
+let starEffectEnabled = false;
+let lastSpawnTime = 0;
+let petalsSpawnedThisSession = false;
+let pageHasLoaded = false;
 
 // 로딩 화면 처리
 window.addEventListener("load", () => {
@@ -7,11 +11,12 @@ window.addEventListener("load", () => {
     loadingScreen.classList.add("fade-out");
     setTimeout(() => {
       loadingScreen.style.display = "none";
+      pageHasLoaded = true; // 🌸 이 시점부터 꽃잎 허용
     }, 500);
   }, 1500);
 });
 
-// 날짜, 선택한 날짜 초기화
+// 날짜 초기화
 const year = 2025;
 const month = 4;
 const today = new Date();
@@ -37,21 +42,18 @@ function generateCalendar(year, month) {
     cell.textContent = date;
     const fullDate = new Date(year, month, date);
 
-    if (
-      fullDate.toDateString() === today.toDateString()
-    ) {
+    if (fullDate.toDateString() === today.toDateString()) {
       cell.classList.add("today");
     }
 
-    if (
-      fullDate.toDateString() === selectedDate.toDateString()
-    ) {
+    if (fullDate.toDateString() === selectedDate.toDateString()) {
       cell.classList.add("selected");
     }
 
     cell.addEventListener("click", () => {
       selectedDate = fullDate;
       generateCalendar(year, month);
+      resetPetalEffectIfNeeded();
       loadTodo();
     });
 
@@ -68,7 +70,7 @@ function generateCalendar(year, month) {
   }
 }
 
-// 투두리스트 요소 참조
+// 투두 요소 참조
 const todoInput = document.getElementById("todo-input");
 const addBtn = document.getElementById("add-btn");
 const todoList = document.getElementById("todo-list");
@@ -98,6 +100,7 @@ function loadTodo() {
     checkbox.addEventListener("change", () => {
       item.done = checkbox.checked;
       saveTodo(dateKey, todos);
+      resetPetalEffectIfNeeded();
       loadTodo();
     });
 
@@ -148,27 +151,77 @@ function updateGrowth() {
   }
 
   const image = document.getElementById("growth-image");
-  image.classList.remove("large");  // 초기화 (중복 방지)
+  image.classList.remove("large");
   const countText = document.getElementById("completed-count");
-  
+
   if (completedCount >= 30) {
     image.src = "images/벚나무.png";
-    image.classList.add("large");   // 3배 확대
-    // startFlowerEffect?.();
+    image.classList.add("large");
+    starEffectEnabled = true;
+
+    if (!petalsSpawnedThisSession && pageHasLoaded) {
+      spawnPetals(80);
+      petalsSpawnedThisSession = true;
+    }
   } else if (completedCount >= 20) {
     image.src = "images/벚나무.png";
-    image.classList.add("large");   // 3배 확대
-    // stopFlowerEffect?.();
+    image.classList.add("large");
+    starEffectEnabled = false;
   } else if (completedCount >= 10) {
     image.src = "images/나무기둥.jpg";
-    // stopFlowerEffect?.();
+    starEffectEnabled = false;
   } else {
     image.src = "images/새싹.png";
-    // stopFlowerEffect?.();
+    starEffectEnabled = false;
   }
 
   countText.textContent = `완료한 목표: ${completedCount}개`;
 }
+
+function handleMouseMove(e) {
+  if (!starEffectEnabled) return;
+  const now = Date.now();
+  if (now - lastSpawnTime < 100) return;
+  lastSpawnTime = now;
+
+  const star = document.createElement("div");
+  star.className = "star";
+  star.textContent = "✨";
+  star.style.left = e.clientX + "px";
+  star.style.top = e.clientY + "px";
+  document.body.appendChild(star);
+
+  setTimeout(() => {
+    star.remove();
+  }, 1500);
+}
+
+function spawnPetals(count = 30) {
+  for (let i = 0; i < count; i++) {
+    const petal = document.createElement("div");
+    petal.className = "petal";
+
+    const startX = Math.random() * window.innerWidth;
+    const delay = Math.random() * 1.5;
+
+    petal.style.left = `${startX}px`;
+    petal.style.top = `-30px`;
+    petal.style.position = "fixed";
+    petal.style.animationDelay = `${delay}s`;
+
+    document.body.appendChild(petal);
+
+    setTimeout(() => {
+      petal.remove();
+    }, 10000);
+  }
+}
+
+function resetPetalEffectIfNeeded() {
+  petalsSpawnedThisSession = false;
+}
+
+document.addEventListener("mousemove", handleMouseMove);
 
 addBtn.addEventListener("click", () => {
   const text = todoInput.value.trim();
@@ -181,6 +234,7 @@ addBtn.addEventListener("click", () => {
   todos.push({ text, done: false });
   saveTodo(dateKey, todos);
   todoInput.value = "";
+  resetPetalEffectIfNeeded();
   loadTodo();
 });
 
