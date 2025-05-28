@@ -148,20 +148,23 @@ function updateGrowth() {
   }
 
   const image = document.getElementById("growth-image");
+  image.classList.remove("large");  // 초기화 (중복 방지)
   const countText = document.getElementById("completed-count");
-
+  
   if (completedCount >= 30) {
-    image.src = "images/벚나무.jpg";
-    startFlowerEffect?.();
+    image.src = "images/벚나무.png";
+    image.classList.add("large");   // 3배 확대
+    // startFlowerEffect?.();
   } else if (completedCount >= 20) {
-    image.src = "images/벚나무.jpg";
-    stopFlowerEffect?.();
+    image.src = "images/벚나무.png";
+    image.classList.add("large");   // 3배 확대
+    // stopFlowerEffect?.();
   } else if (completedCount >= 10) {
     image.src = "images/나무기둥.jpg";
-    stopFlowerEffect?.();
+    // stopFlowerEffect?.();
   } else {
     image.src = "images/새싹.png";
-    stopFlowerEffect?.();
+    // stopFlowerEffect?.();
   }
 
   countText.textContent = `완료한 목표: ${completedCount}개`;
@@ -182,3 +185,4 @@ addBtn.addEventListener("click", () => {
 });
 
 generateCalendar(year, month);
+loadTodo();

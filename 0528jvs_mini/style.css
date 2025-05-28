@@ -160,3 +160,9 @@ body {
   width: 100px;
   margin: 10px 0;
 }
+
+/* 4배 확대용 클래스 */
+.growth-box img.large {
+  width: 300px;
+  margin: 10px 0;
+}
