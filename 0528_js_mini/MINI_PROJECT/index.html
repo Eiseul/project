@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- p5.js 는 defer 없어도 됩니다 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+
+  <!-- 구글 웹폰트: 나눔고딕과 개구 불러오기 -->
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu&family=Nanum+Gothic&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet" />
+
+  <script>
+    // 전역 변수로 가장 먼저 정의
+    let selectedDate = null;
+  </script>
+  <script src="script.js" defer></script>
+  <script src="todo.js" defer></script>
+  <script src="calendar.js" defer></script>
+  <script src="tree.js" defer></script>
+</head>
+
+<body>
+  <div id="loading-screen">
+    <p><span class="flower-spin">🌸</span>LOADING...</p>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <!-- 왼쪽: 달력 -->
+    <aside id="calendar-container"></aside>
+
+    <!-- 중간: To-Do -->
+    <section class="main">
+      <h2 class="todo-title">📌 To-Do List</h2> <!-- 타이틀 추가 -->
+      <button id="addBtn" class="add-btn">＋</button>
+      <ul id="todoList" class="todo-list"></ul>
+      <form id="todoForm">
+        <input id="todoTitle" type="text" placeholder="제목" required />
+        <input id="todoDesc" type="text" placeholder="설명" />
+        <input id="todoDue" type="date" />
+        <button type="submit">저장</button>
+      </form>
+    </section>
+
+    <!-- 오른쪽: 성장 나무 -->
+    <aside class="growth-box">
+      <img id="growth-image" src="img/새싹.png" alt="성장 이미지" />
+      <div id="completed-count">완료한 목표: 0개</div>
+    </aside>
+  </div>
+</body>
+
+</html>
