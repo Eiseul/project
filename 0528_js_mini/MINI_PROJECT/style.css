@@ -1,0 +1,381 @@
+/* ── Reset & Global ── */
+/* 모든 요소에 box-sizing을 border-box로 설정하여 padding과 border가 크기에 포함되도록 함 */
+* {
+  box-sizing: border-box;
+  margin: 0;   /* 기본 여백 제거 */
+  padding: 0;  /* 기본 패딩 제거 */
+}
+
+/* 기본 폰트는 개구체 (body에만 지정) */
+body {
+  font-family: 'Gowun Dodum', sans-serif;
+}
+
+/* 로딩 화면 내 텍스트는 나눔고딕 적용 */
+#loading-screen p {
+  font-family: 'Nanum Gothic', sans-serif;
+}
+
+/* html과 body 태그 기본 스타일 설정 (font-family는 제거) */
+html,
+body {
+  margin: 0;             /* 기본 마진 제거 */
+  padding: 0;            /* 기본 패딩 제거 */
+  width: 100%;           /* 전체 너비 100% */
+  height: 100%;          /* 전체 높이 100% */
+  overflow: auto;        /* 기본 스크롤 동작 허용 */
+  background: transparent; /* 배경 투명 처리 */
+  color: #333;           /* 기본 텍스트 색상 */
+}
+
+/* ── 꽃잎 배경 캔버스 ── */
+/* p5.js 캔버스가 배경에 고정되도록 스타일 지정 */
+canvas {
+  position: fixed;       /* 화면에 고정 */
+  top: 0;                /* 상단 0 위치 */
+  left: 0;               /* 좌측 0 위치 */
+  width: 100vw;          /* 뷰포트 너비 100% */
+  height: 100vh;         /* 뷰포트 높이 100% */
+  z-index: 0;            /* 가장 뒤쪽에 배치 */
+  pointer-events: none;  /* 마우스 이벤트 무시 */
+}
+
+/* ── 로딩 화면 ── */
+/* 로딩 화면 박스 중앙에 고정 */
+#loading-screen {
+  position: fixed;       /* 화면 고정 */
+  top: 50%;              /* 화면 세로 중앙 */
+  left: 50%;             /* 화면 가로 중앙 */
+  transform: translate(-50%, -50%); /* 정확히 중앙 정렬 */
+  background: rgba(255, 255, 255, 0.9); /* 반투명 흰색 배경 */
+  padding: 20px;         /* 내부 여백 */
+  border-radius: 12px;   /* 둥근 모서리 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 약한 그림자 */
+  display: flex;         /* 플렉스 박스 */
+  flex-direction: column; /* 세로 방향 정렬 */
+  align-items: center;   /* 가로 중앙 정렬 */
+  z-index: 2;            /* 다른 요소 위에 표시 */
+}
+
+/* 로딩 화면 내 회전하는 꽃잎 아이콘 스타일 */
+.flower-spin {
+  width: 40px;           /* 가로 크기 */
+  height: 40px;          /* 세로 크기 */
+  margin-right: 8px;     /* 오른쪽 여백 */
+  display: inline-block; /* 인라인 블록으로 표시 */
+  animation: spin 1.5s linear infinite; /* 무한 회전 애니메이션 */
+}
+
+/* 회전 애니메이션 정의 */
+@keyframes spin {
+  from {
+    transform: rotate(0); /* 0도에서 시작 */
+  }
+  to {
+    transform: rotate(360deg); /* 360도 회전 */
+  }
+}
+
+/* 로딩 진행 바 배경 */
+.progress-bar {
+  margin-top: 12px;      /* 위쪽 여백 */
+  width: 200px;          /* 너비 고정 */
+  height: 15px;          /* 높이 고정 */
+  background: #f0d9e7;   /* 연분홍색 배경 */
+  border-radius: 10px;   /* 둥근 모서리 */
+  overflow: hidden;      /* 넘침 숨김 */
+}
+
+/* 로딩 진행 바 채우기 부분 */
+.progress-fill {
+  width: 0;              /* 초기 너비 0 */
+  height: 100%;          /* 부모 높이 전체 */
+  background: #f78fb3;   /* 밝은 분홍색 */
+  animation: fillBar 2s forwards ease-in-out; /* 2초간 너비 증가 애니메이션 */
+}
+
+/* 진행 바 너비 증가 애니메이션 정의 */
+@keyframes fillBar {
+  from {
+    width: 0;            /* 시작 너비 0 */
+  }
+  to {
+    width: 100%;         /* 최종 너비 100% */
+  }
+}
+
+/* ── 숨김 유틸 ── */
+/* 특정 요소를 강제로 숨김 처리 */
+.hidden {
+  display: none !important;
+}
+
+/* ── 앱 컨테이너 ── */
+/* 전체 앱 영역을 절대 위치로 화면에 꽉 채움, 플렉스 컨테이너 설정 */
+#app {
+  position: absolute;    /* 절대 위치 */
+  top: 0;                /* 상단 0 */
+  left: 0;               /* 좌측 0 */
+  width: 100vw;          /* 뷰포트 너비 100% */
+  height: 100vh;         /* 뷰포트 높이 100% */
+  display: flex;         /* 가로 플렉스 컨테이너 */
+  z-index: 1;            /* 배경 캔버스 위에 위치 */
+}
+
+/* ── 캘린더 ── */
+/* 왼쪽 캘린더 영역 고정 너비, 높이는 부모와 동일 */
+#calendar-container {
+  width: 320px;                           /* 고정 너비 */
+  height: 100%;                          /* 부모 높이 전체 */
+  background: rgba(255, 255, 255, 0.85); /* 약간 투명한 흰색 배경 */
+  border-right: 1px solid #f0d9e7;      /* 오른쪽 테두리 */
+  padding: 40px 20px;                    /* 내부 여백 */
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05); /* 약한 그림자 */
+  display: flex;                        /* 플렉스 컨테이너 */
+  flex-direction: column;               /* 세로 방향 배치 */
+  color: #444;                         /* 글자 색 */
+  flex-shrink: 0;                      /* 축소 금지 */
+  flex: 0 0 30%;                       /* 너비 30% 고정 */
+}
+
+/* 캘린더 헤더 스타일 */
+.calendar-header {
+  display: flex;                       /* 가로 플렉스 */
+  justify-content: space-between;     /* 양쪽 정렬 */
+  align-items: center;                 /* 세로 중앙 정렬 */
+  margin-bottom: 25px;                 /* 아래 여백 */
+  font-size: 1.3em;                   /* 글자 크기 */
+  font-weight: bold;                  /* 글자 굵기 */
+  color: #d16086;                    /* 글자 색 */
+}
+
+/* 캘린더 헤더 버튼 기본 스타일 */
+.calendar-header button {
+  background: none;                   /* 배경 없음 */
+  border: none;                      /* 테두리 없음 */
+  font-size: 1.6em;                  /* 글자 크기 */
+  cursor: pointer;                   /* 포인터 커서 */
+  color: #f78fb3;                   /* 글자 색 */
+  padding: 0 10px;                   /* 좌우 여백 */
+  transition: color 0.2s;            /* 색상 전환 효과 */
+}
+
+/* 버튼 호버 시 색상 변경 */
+.calendar-header button:hover {
+  color: #d16086;
+}
+
+/* 요일과 날짜 영역 그리드 배치 */
+.calendar-weekdays,
+.calendar-days {
+  display: grid;                     /* 그리드 레이아웃 */
+  grid-template-columns: repeat(7, 1fr); /* 7열 균등 분할 */
+  text-align: center;                /* 중앙 정렬 */
+  gap: 8px;                         /* 칸 간격 */
+}
+
+/* 요일 영역 스타일 */
+.calendar-weekdays {
+  font-weight: bold;                /* 굵은 글자 */
+  margin-bottom: 15px;              /* 아래 여백 */
+  color: #aaa;                     /* 회색 글자 */
+  font-size: 0.9em;                /* 글자 크기 */
+}
+
+/* 각 날짜 셀 스타일 */
+.calendar-days span {
+  display: inline-block;            /* 인라인 블록 */
+  width: 2.2em;                    /* 가로 크기 */
+  height: 2.2em;                   /* 세로 크기 */
+  line-height: 2.2em;              /* 텍스트 수직 중앙 */
+  text-align: center;              /* 텍스트 중앙 */
+  position: relative;              /* 상대 위치 */
+  color: #444;                    /* 글자 색 */
+  font-weight: normal;             /* 일반 굵기 */
+}
+
+/* 오늘 날짜에 표시할 아이콘 배경 */
+.calendar-days span.today {
+  background-color: transparent !important; /* 배경 투명 */
+  background-image: url('img/free-icon-love-13139183.png'); /* 아이콘 이미지 */
+  background-repeat: no-repeat;         /* 반복 없음 */
+  background-position: center;          /* 중앙 정렬 */
+  background-size: 2em 2em;             /* 크기 조절 */
+  color: inherit;                       /* 글자색 상속 */
+}
+
+/* 선택된 날짜 스타일 */
+.calendar-days span.selected {
+  background-color: transparent; /* 배경 투명 */
+  color: black;                  /* 검정 글자 */
+  font-weight: bold;             /* 굵은 글자 */
+}
+
+/* 빈 날짜 셀 스타일 */
+.calendar-days span:empty {
+  cursor: default;               /* 기본 커서 */
+  background: none !important;  /* 배경 없음 */
+}
+
+/* ── 메인(To-Do) ── */
+/* 투두 리스트 영역 스타일 */
+.main {
+  flex: 0 0 45%;               /* 너비 45% 고정 */
+  position: relative;          /* 상대 위치 */
+  height: 100%;                /* 부모 높이 꽉 채우기 */
+  overflow-y: auto;            /* 세로 스크롤 활성화 */
+  padding: 40px 20px;          /* 내부 여백 */
+}
+
+/* 추가 버튼 스타일 (고정 위치) */
+.add-btn {
+  position: fixed;             /* 화면 고정 위치 */
+  top: 16px;                  /* 상단 16px */
+  right: 16px;                /* 우측 16px */
+  width: 40px;                /* 너비 40px */
+  height: 40px;               /* 높이 40px */
+  border: 2px solid #444;     /* 테두리 */
+  border-radius: 50%;         /* 원형 */
+  background: none;           /* 배경 없음 */
+  font-size: 24px;            /* 글자 크기 */
+  line-height: 0;             /* 줄 높이 0 */
+  cursor: pointer;            /* 포인터 커서 */
+  z-index: 3;                 /* 위에 표시 */
+}
+
+/* 투두 리스트 ul 스타일 */
+.todo-list {
+  list-style: none;           /* 기본 리스트 스타일 제거 */
+  margin-top: 20px;           /* 위쪽 여백 */
+  display: flex;              /* 플렉스 컨테이너 */
+  flex-direction: column;     /* 세로 방향 배치 */
+  gap: 12px;                 /* 아이템 간격 */
+}
+
+/* 개별 투두 아이템 스타일 */
+.todo-item {
+  display: flex;              /* 가로 배치 */
+  align-items: center;        /* 수직 중앙 정렬 */
+  gap: 8px;                   /* 아이템 간 간격 */
+  padding: 6px 10px;          /* 내부 여백 */
+  background: #fff;           /* 흰색 배경 */
+  border: 2px solid #444;     /* 테두리 */
+  border-radius: 12px;        /* 둥근 모서리 */
+}
+
+/* 체크 버튼 스타일 */
+.check-btn {
+  width: 32px;                /* 너비 */
+  height: 32px;               /* 높이 */
+  border: 2px solid #444;     /* 테두리 */
+  border-radius: 50%;         /* 원형 */
+  background: none;           /* 배경 없음 */
+  cursor: pointer;            /* 포인터 커서 */
+}
+
+/* 투두 텍스트 영역 스타일 */
+.todo-text {
+  flex: 1;                   /* 남은 공간 모두 차지 */
+}
+
+/* 수정, 삭제 버튼 컨테이너 */
+.actions {
+  display: flex;             /* 가로 배치 */
+  gap: 8px;                  /* 버튼 간 간격 */
+}
+
+/* 수정, 삭제 버튼 스타일 */
+.actions button {
+  padding: 4px 8px;          /* 내부 여백 */
+  border: 2px solid #444;    /* 테두리 */
+  border-radius: 8px;        /* 둥근 모서리 */
+  background: none;          /* 배경 없음 */
+  cursor: pointer;           /* 포인터 커서 */
+}
+
+/* ── To-Do 입력 폼 ── */
+/* 폼 위치를 화면 중앙 고정, 기본 숨김 */
+#todoForm {
+  position: fixed;             /* 화면 고정 */
+  top: 50%;                   /* 세로 중앙 */
+  left: 50%;                  /* 가로 중앙 */
+  transform: translate(-50%, -50%); /* 정확히 중앙 정렬 */
+  width: 300px;               /* 너비 고정 */
+  padding: 20px;              /* 내부 여백 */
+  background: #f3c9c9;        /* 연한 분홍 배경 */
+  border-radius: 12px;        /* 둥근 모서리 */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* 그림자 */
+  display: none;              /* 기본 숨김 */
+  flex-direction: column;     /* 세로 방향 배치 */
+  gap: 15px;                  /* 아이템 간 간격 */
+  z-index: 4;                 /* 위에 표시 */
+}
+
+/* show 클래스가 붙으면 폼 보임 */
+#todoForm.show {
+  display: flex !important;
+}
+
+/* 폼 내 input, button 기본 스타일 */
+#todoForm input,
+#todoForm button {
+  padding: 10px 15px;         /* 내부 여백 */
+  border: 2px solid #444;     /* 테두리 */
+  border-radius: 8px;         /* 둥근 모서리 */
+  font-size: 16px;            /* 글자 크기 */
+  background: #fff;           /* 흰색 배경 */
+}
+
+/* 제출 버튼 스타일 */
+#todoForm button[type="submit"] {
+  background: #f78fb3;        /* 분홍색 배경 */
+  color: #fff;                /* 흰색 글자 */
+  border-color: #f78fb3;      /* 테두리 색상 */
+  cursor: pointer;            /* 포인터 커서 */
+  transition: background 0.2s; /* 배경 색상 전환 */
+}
+
+/* 제출 버튼 호버 효과 */
+#todoForm button[type="submit"]:hover {
+  background: #d16086;        /* 진한 분홍 배경 */
+}
+
+/* ── 성장 나무 영역 ── */
+/* 성장 나무 박스 영역 스타일 */
+.growth-box {
+  flex: 0 0 25%;              /* 너비 25% 고정 */
+  padding: 20px;              /* 내부 여백 */
+  background-color: rgba(255, 244, 248, 0.7); /* 배경 반투명 연분홍 */
+  display: flex;              /* 플렉스 컨테이너 */
+  flex-direction: column;     /* 세로 방향 배치 */
+  align-items: center;        /* 가로 중앙 정렬 */
+  justify-content: center;    /* 세로 중앙 정렬 */
+  text-align: center;         /* 텍스트 중앙 정렬 */
+}
+
+/* 성장 이미지 크기 및 애니메이션 */
+.growth-box img {
+  width: 250px;                /* 기본 너비 */
+  margin: 10px 0;             /* 위아래 마진 */
+  transition: width 0.3s ease; /* 너비 변경 부드럽게 전환 */
+}
+
+/* 완료 기준 시 이미지 크기 커짐 */
+.growth-box img.large {
+  width: 240px;               /* 커진 너비 */
+}
+
+/* 타이틀 */
+.todo-title {
+  margin-bottom: 8px !important; /* 아래 여백 */
+  font-size: 1.5em !important;   /* 폰트 크기 */
+  color: #d16086 !important;     /* 글자 색 */
+  font-weight: bold;             /* 굵게 */
+  text-align: left;              /* 왼쪽 정렬 */
+}
+/* 완료 목록 밑줄 */
+.todo-text.checked {
+  text-decoration: line-through;
+  opacity: 0.6;
+  color: #888;
+}
